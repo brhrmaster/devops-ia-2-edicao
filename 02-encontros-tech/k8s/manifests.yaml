@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: encontros-tech
+  namespace: bootcamp-ai-devops
   labels:
     app: encontros-tech
 spec:
@@ -16,12 +17,20 @@ spec:
     spec:
       containers:
       - name: encontros-tech
-        image: fabricioveronez/bootcamp-encontros-tech:v1
+        image: brhrmaster/bootcamp-encontros-tech:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         env:
         - name: DATABASE_URL
-          value: "postgresql://doadmin:AVNS_CE9P-aoE7jr3lxNg8jn@private-db-postgresql-nyc1-21167-do-user-10478846-0.e.db.ondigitalocean.com:25060/defaultdb?sslmode=require"
+          value: "postgresql://encontros_tech:AVNS_k_tSIIcSS1mcumT3lIX@db-postgresql-homologacao-do-user-28212959-0.e.db.ondigitalocean.com:25060/encontros_tech?sslmode=require"
         - name: APP_TITLE
           value: "Encontros Tech"
         - name: DEBUG
@@ -45,6 +54,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: encontros-tech
+  namespace: bootcamp-ai-devops
   labels:
     app: encontros-tech
 spec:
