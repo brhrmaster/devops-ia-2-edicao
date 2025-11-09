@@ -6,7 +6,6 @@ metadata:
   labels:
     app: encontros-tech
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: encontros-tech
@@ -17,20 +16,19 @@ spec:
     spec:
       containers:
       - name: encontros-tech
-        image: brhrmaster/bootcamp-encontros-tech:latest
-        imagePullPolicy: Always
+        image: brhrmaster/bootcamp-conversao-distancia:v1
         ports:
-        - containerPort: 8000
+        - containerPort: 5000
         resources:
           requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
             memory: "256Mi"
             cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
         env:
         - name: DATABASE_URL
-          value: "postgresql://encontros_tech:AVNS_k_tSIIcSS1mcumT3lIX@db-postgresql-homologacao-do-user-28212959-0.e.db.ondigitalocean.com:25060/encontros_tech?sslmode=require"
+          value: "postgresql://*****:********@db-postgresql-homologacao-do-user-28212959-0.e.db.ondigitalocean.com:25060/encontros_tech?sslmode=require"
         - name: APP_TITLE
           value: "Encontros Tech"
         - name: DEBUG
@@ -61,7 +59,29 @@ spec:
   type: LoadBalancer
   ports:
   - port: 80
-    targetPort: 8000
+    targetPort: 5000
     protocol: TCP
   selector:
     app: encontros-tech
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: encontros-tech
+  namespace: bootcamp-ai-devops
+  labels:
+    app: encontros-tech
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: encontros-tech
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
